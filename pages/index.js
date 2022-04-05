@@ -5,68 +5,32 @@ import sanity from "../lib/sanity";
 import listStyles from "../styles/list";
 import imageUrlFor from "../utils/imageUrlFor";
 
-const query = `*[_type == "movie"] {
+const query = `*[_type == "post"] {
   _id,
   title,
-  releaseDate,
+  body,
   poster,
-  "posterAspect": poster.asset->.metadata.dimensions.aspectRatio,
-  "director": crewMembers[job == "Director"][0].person->name
 }[0...50]
 `;
 
-const Movies = ({ movies }) => {
+const Pages = ({ pages }) => {
   return (
     <Layout>
-      <div className="movies">
-        <ul className="list">
-          {movies.map(movie => (
-            <li key={movie._id} className="list__item">
-              <Link href="/movie/[id]" as={`/movie/${movie._id}`}>
-                <a>
-                  {movie.poster && (
-                    <img
-                      src={imageUrlFor(movie.poster)
-                        .ignoreImageParams()
-                        .width(300)}
-                      width="100"
-                      height={100 / movie.posterAspect}
-                    />
-                  )}
-                  <div style={{ paddingTop: "0.2em" }}>
-                    {movie.releaseDate.substr(0, 4)}
-                  </div>
-                  <h3>{movie.title}</h3>
-                  {movie.director && (
-                    <span className="movies-list__directed-by">
-                      Directed by {movie.director}
-                    </span>
-                  )}
-                </a>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <div class="container">
+        <div v-if="post">
+          <h1 class="title" v-text="{post.title}">{post.title}</h1>
+          <div class="content">{post.body}</div>
+        </div>
       </div>
-      <style jsx>{`
-        .movies {
-          padding: 1rem;
-        }
-        .movies-list__directed-by {
-          display: block;
-          font-size: 1rem;
-        }
-      `}</style>
-      <style jsx>{listStyles}</style>
     </Layout>
   );
 };
 
 export const getStaticProps = async () => {
-  const movies = await sanity.fetch(query);
+  const pages = await sanity.fetch(query);
   return {
-    props: { movies } // will be passed to the page component as props
+    props: { pages } // will be passed to the page component as props
   };
 };
 
-export default Movies;
+export default Pages;
